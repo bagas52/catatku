@@ -1,0 +1,69 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #FAFAF7;
+  --surface: #FFFFFF;
+  --ink: #1C1B1A;
+  --muted: #6B6862;
+  --accent: #3E5C4F;
+  --warn: #B85C38;
+}
+
+.dark {
+  --bg: #16181A;
+  --surface: #1F2225;
+  --ink: #EDEDEA;
+  --muted: #9A968E;
+  --accent: #7FA98C;
+  --warn: #E08A5C;
+}
+
+/* Smooth transition only for dark mode toggle */
+html {
+  transition: background-color 0.25s ease, color 0.25s ease;
+  background-color: var(--bg);
+  color: var(--ink);
+}
+
+body {
+  font-family: 'Sora', sans-serif;
+  background-color: var(--bg);
+  color: var(--ink);
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Note body typography */
+.font-note-body {
+  font-family: 'Lora', Georgia, serif;
+  line-height: 1.6;
+}
+
+/* Clean scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--muted);
+  opacity: 0.3;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  opacity: 0.6;
+}
+
+/* Hide scrollbar on category tabs while keeping scrollable */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none" >
+  <defs>
+    <linearGradient id="paper" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FDFCF8"/>
+      <stop offset="1" stop-color="#F4F0E6"/>
+    </linearGradient>
+    <linearGradient id="sage" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4A6E5D"/>
+      <stop offset="1" stop-color="#3E5C4F"/>
+    </linearGradient>
+    <linearGradient id="sageLight" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7FA98C"/>
+      <stop offset="1" stop-color="#5F8A71"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Positioned inside 120-472 box -->
+
+  <!-- Open notebook: left page (covers), back pages -->
+  <!-- back pages (right) -->
+  <path d="M300 132 C360 118 420 124 452 156 L452 376 C420 344 360 338 300 352 Z" fill="#D7D9D0"/>
+
+  <!-- open notebook body -->
+  <path d="M124 160 L300 132 L300 356 L124 384 Z" fill="url(#paper)"/>
+  <path d="M300 132 L452 156 L452 376 L300 352 Z" fill="#F7F4EB"/>
+
+  <!-- notebook edges (left + spine) -->
+  <path d="M120 388 L120 164 C120 148 131 138 148 136 L300 130 L300 384 L150 392 Z" fill="url(#sage)"/>
+  <path d="M120 164 L120 388 L150 392 L150 142 Z" fill="#35503F"/>
+
+  <!-- right cover edge -->
+  <path d="M300 384 L452 376 L452 416 L300 424 Z" fill="#35503F"/>
+
+  <!-- ruled guide lines on left page -->
+  <g stroke="#B9C4B8" stroke-width="3" stroke-linecap="round" opacity="0.7">
+    <line x1="172" y1="192" x2="282" y2="184"/>
+    <line x1="172" y1="216" x2="282" y2="208"/>
+    <line x1="172" y1="240" x2="282" y2="232"/>
+  </g>
+
+  <!-- red margin line -->
+  <line x1="188" y1="180" x2="182" y2="300" stroke="#D9A48A" stroke-width="3.5" stroke-linecap="round" opacity="0.85"/>
+
+  <!-- checkmark (pen stroke) over notebook -->
+  <path d="M210 258 C232 290 258 318 284 342 C330 300 362 246 396 190"
+        stroke="url(#sageLight)" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M210 258 C232 290 258 318 284 342"
+        stroke="#2E4639" stroke-width="26" stroke-linecap="round" stroke-linejoin="round" opacity="0"/>
+</svg>

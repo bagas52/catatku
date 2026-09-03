@@ -1,0 +1,96 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>
+*{box-sizing:border-box}body{margin:0;background:#EDEBE6;font-family:Sora,'Segoe UI',sans-serif;color:#2B2A27;padding:36px}
+h1{font-size:20px;text-align:center;margin:0 0 6px;color:#3E5C4F}
+.sub{text-align:center;font-size:13px;color:#6B6862;margin:0 0 28px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;max-width:760px;margin:0 auto}
+.card{background:#fff;border-radius:16px;padding:26px;box-shadow:0 18px 40px rgba(0,0,0,.16);text-align:center}
+.card .tile{width:150px;height:150px;margin:0 auto 18px;border-radius:18px;display:flex;align-items:center;justify-content:center;border:1px solid #EDE9DE;background:#FBFAF5}
+.card .tile svg{width:120px;height:120px}
+.card h2{font-size:15px;margin:0 0 4px;color:#2B2A27}
+.card p{font-size:12px;color:#8A867D;margin:0 0 14px}
+.badge{display:inline-block;font-size:11px;font-weight:600;color:#3E5C4F;background:#E7EFE9;border:1px solid #C9D8CD;padding:4px 10px;border-radius:999px}
+</style></head><body>
+<h1>Logo CatatKu &mdash; Konsep Vektor</h1>
+<p class="sub">Warm-minimal &bull; Paper-first &bull; Sage green &bull; Bukan huruf &quot;C&quot;</p>
+<div class="grid">
+ <div class="card"><div class="tile"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none" role="img" aria-label="CatatKu logo mark">
+  <defs>
+    <linearGradient id="paper" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FDFCF8"/>
+      <stop offset="1" stop-color="#F4F0E6"/>
+    </linearGradient>
+    <linearGradient id="sage" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4A6E5D"/>
+      <stop offset="1" stop-color="#3E5C4F"/>
+    </linearGradient>
+    <linearGradient id="sageLight" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7FA98C"/>
+      <stop offset="1" stop-color="#5F8A71"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Positioned inside 120-472 box -->
+
+  <!-- Open notebook: left page (covers), back pages -->
+  <!-- back pages (right) -->
+  <path d="M300 132 C360 118 420 124 452 156 L452 376 C420 344 360 338 300 352 Z" fill="#D7D9D0"/>
+
+  <!-- open notebook body -->
+  <path d="M124 160 L300 132 L300 356 L124 384 Z" fill="url(#paper)"/>
+  <path d="M300 132 L452 156 L452 376 L300 352 Z" fill="#F7F4EB"/>
+
+  <!-- notebook edges (left + spine) -->
+  <path d="M120 388 L120 164 C120 148 131 138 148 136 L300 130 L300 384 L150 392 Z" fill="url(#sage)"/>
+  <path d="M120 164 L120 388 L150 392 L150 142 Z" fill="#35503F"/>
+
+  <!-- right cover edge -->
+  <path d="M300 384 L452 376 L452 416 L300 424 Z" fill="#35503F"/>
+
+  <!-- ruled guide lines on left page -->
+  <g stroke="#B9C4B8" stroke-width="3" stroke-linecap="round" opacity="0.7">
+    <line x1="172" y1="192" x2="282" y2="184"/>
+    <line x1="172" y1="216" x2="282" y2="208"/>
+    <line x1="172" y1="240" x2="282" y2="232"/>
+  </g>
+
+  <!-- red margin line -->
+  <line x1="188" y1="180" x2="182" y2="300" stroke="#D9A48A" stroke-width="3.5" stroke-linecap="round" opacity="0.85"/>
+
+  <!-- checkmark (pen stroke) over notebook -->
+  <path d="M210 258 C232 290 258 318 284 342 C330 300 362 246 396 190"
+        stroke="url(#sageLight)" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M210 258 C232 290 258 318 284 342"
+        stroke="#2E4639" stroke-width="26" stroke-linecap="round" stroke-linejoin="round" opacity="0"/>
+</svg>
+</div><h2>Varian 1</h2><p>Notebook terbuka &amp; tanda centang &mdash; unsur kertas &amp; mencatat</p><span class="badge">Direkomendasikan</span></div>
+ <div class="card"><div class="tile"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none" role="img" aria-label="CatatKu logo mark - check on paper">
+  <defs>
+    <linearGradient id="s1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4A6E5D"/>
+      <stop offset="1" stop-color="#3E5C4F"/>
+    </linearGradient>
+  </defs>
+
+  <!-- rounded paper sheet -->
+  <rect x="128" y="120" rx="30" fill="#FBFAF5" stroke="#DCD8CC" stroke-width="6"/>
+
+  <!-- top-left folded corner accent -->
+  <path d="M128 176 Q152 150 184 120 L128 120 Z" fill="#EDE9DC"/>
+
+  <!-- ruled text lines -->
+  <g stroke="#C4CFC2" stroke-width="6" stroke-linecap="round" opacity="0.85">
+    <line x1="164" y1="182" x2="330" y2="182"/>
+    <line x1="164" y1="214" x2="300" y2="214"/>
+    <line x1="164" y1="246" x2="286" y2="246"/>
+  </g>
+
+  <!-- left margin notch -->
+  <line x1="176" y1="176" x2="176" y2="252" stroke="#D9A48A" stroke-width="7" stroke-linecap="round" opacity="0.75"/>
+
+  <!-- checkmark drawn over text -->
+  <path d="M200 262 C218 286 236 306 258 326 C292 296 320 262 352 220"
+        stroke="url(#s1)" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+</div><h2>Varian 2</h2><p>Lembar kertas dengan garis tulis &amp; centang &mdash; ringkas &amp; ikonik</p><span class="badge">Minimalis</span></div>
+</div>
+</body></html>

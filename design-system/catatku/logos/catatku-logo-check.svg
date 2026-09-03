@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" fill="none" role="img" aria-label="CatatKu logo mark - check on paper">
+  <defs>
+    <linearGradient id="s1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4A6E5D"/>
+      <stop offset="1" stop-color="#3E5C4F"/>
+    </linearGradient>
+  </defs>
+
+  <!-- rounded paper sheet -->
+  <rect x="128" y="120" width="256" height="256" rx="30" fill="#FBFAF5" stroke="#DCD8CC" stroke-width="6"/>
+
+  <!-- top-left folded corner accent -->
+  <path d="M128 176 Q152 150 184 120 L128 120 Z" fill="#EDE9DC"/>
+
+  <!-- ruled text lines -->
+  <g stroke="#C4CFC2" stroke-width="6" stroke-linecap="round" opacity="0.85">
+    <line x1="164" y1="182" x2="330" y2="182"/>
+    <line x1="164" y1="214" x2="300" y2="214"/>
+    <line x1="164" y1="246" x2="286" y2="246"/>
+  </g>
+
+  <!-- left margin notch -->
+  <line x1="176" y1="176" x2="176" y2="252" stroke="#D9A48A" stroke-width="7" stroke-linecap="round" opacity="0.75"/>
+
+  <!-- checkmark drawn over text -->
+  <path d="M200 262 C218 286 236 306 258 326 C292 296 320 262 352 220"
+        stroke="url(#s1)" stroke-width="24" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
