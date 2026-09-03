@@ -12,12 +12,13 @@ Aplikasi pencatat (note-taking) untuk mahasiswa: mencatat materi kuliah, melacak
 - ✅ **Tandai selesai** & ⭐ **pin** catatan penting
 - 🌗 **Dark mode** penuh (toggle, tersimpan)
 - 💾 **Backup/restore** — ekspor & impor data ke file JSON
-- 📲 **PWA** — installable ke Home Screen (iPhone/Android), offline-ready via service worker
+- 📲 **PWA** — installable ke Home Screen (iPhone/Android), offline-ready via Workbox service worker (auto-update)
 
 ## Teknologi
 
 - [React](https://react.dev) 18 • [TypeScript](https://www.typescriptlang.org) 5.5 • [Vite](https://vitejs.dev) 5.4
 - [Tailwind CSS](https://tailwindcss.com) 3.4 • [lucide-react](https://lucide.dev) (ikon)
+- [vite-plugin-pwa](https://github.com/vite-pwa/vite-plugin-pwa) — Workbox-based service worker + manifest (auto-update)
 - Font: **Sora** (heading) & **Lora** (konten)
 - Penyimpanan: `localStorage` (catatan, tema, pengaturan) + `IndexedDB` (file audio MP3 alarm)
 
@@ -50,9 +51,12 @@ Dev server berjalan di **http://localhost:3000** (port dikonfigurasi di `vite.co
 
 ```
 catatku/
-├─ public/            # Aset statis (maskot, ikon PWA, service worker, manifest, favicon)
-│  ├─ sw.js           # Service worker PWA (cache aset, offline fallback)
-│  └─ site.webmanifest
+├─ public/            # Aset statis (ikon PWA, favicon, logo)
+│  ├─ favicon-180.png
+│  ├─ favicon-192.png
+│  ├─ favicon-512.png
+│  ├─ favicon.png
+│  └─ logo.svg
 ├─ src/
 │  ├─ components/     # Komponen UI (Header, NoteList, NoteItem, SearchBar, modal, dll)
 │  ├─ context/        # NoteContext
@@ -65,10 +69,12 @@ catatku/
 │  └─ index.css       # Tokens warna (light/dark), tipografi, scrollbar
 ├─ index.html
 ├─ tailwind.config.js
-├─ vite.config.ts
+├─ vite.config.ts     # Konfigurasi Vite + vite-plugin-pwa (Workbox)
 └─ design-system/     # Dokumentasi & aset identitas visual
    └─ catatku/MASTER.md
 ```
+
+> **PWA (offline-ready):** `vite-plugin-pwa` + Workbox otomatis meng-generate `sw.js`, `workbox-*.js`, dan `manifest.webmanifest` ke `dist/` saat `npm run build`. Aset yang di-pre-cache: semua bundle JS/CSS, HTML shell, ikon, dan logo. Service worker tidak ada di `public/` — seluruhnya di-generate otomatis dari konfigurasi di `vite.config.ts`.
 
 ## Penyimpanan Data
 

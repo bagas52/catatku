@@ -206,6 +206,8 @@ Semua elemen interaktif punya feedback hover halus (`transition-colors` / `trans
 - Konten tidak tersembunyi di balik header sticky / FAB (padding bawah main `pb-24 sm:pb-12`).
 - Touch target ≥ 44px di mobile untuk kontrol ikon kecil (beri padding tombol).
 - Screenshot verifikasi mobile tersimpan di `design-system/catatku/mobile-check/` (iPhone 12/SE, Pixel 5, 320px, iPad).
+- **PWA offline-ready**: `vite-plugin-pwa` (Workbox) auto-generate `sw.js` + `manifest.webmanifest` saat `npm run build`. Pre-cache mencakup semua bundle JS/CSS, HTML shell, ikon, dan logo. Konfigurasi di `vite.config.ts` (section `VitePWA`).
+- Pengguna dapat menginstall ke Home Screen iPhone/Android: buka di browser → Share/Menu → "Add to Home Screen". PWA terbuka fullscreen seperti native app.
 
 ---
 
