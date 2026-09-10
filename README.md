@@ -13,6 +13,7 @@ Aplikasi pencatat (note-taking) untuk mahasiswa: mencatat materi kuliah, melacak
 - 🌗 **Dark mode** penuh (toggle, tersimpan)
 - 💾 **Backup/restore** — ekspor & impor data ke file JSON
 - 📲 **PWA** — installable ke Home Screen (iPhone/Android), offline-ready via Workbox service worker (auto-update)
+- 🔔 **Push notification** — notifikasi ke lock screen HP saat deadline mendekati (1 hari / 1 jam / 30 menit), backend Vercel serverless + Vercel KV
 
 ## Teknologi
 
@@ -51,6 +52,12 @@ Dev server berjalan di **http://localhost:3000** (port dikonfigurasi di `vite.co
 
 ```
 catatku/
+├─ api/               # Vercel serverless functions (push notification backend)
+│  ├─ _lib/           # Shared: webpush.ts (kirim push), kv.ts (Vercel KV client)
+│  ├─ subscribe.ts    # Simpan push subscription + deadline
+│  ├─ unsubscribe.ts  # Hapus subscription/note
+│  └─ cron/           # Cron job (setiap 5 menit)
+│     └─ check-deadlines.ts  # Cek deadline → kirim push ke HP
 ├─ public/            # Aset statis (ikon PWA, favicon, logo)
 │  ├─ favicon-180.png
 │  ├─ favicon-192.png
@@ -63,7 +70,7 @@ catatku/
 │  ├─ hooks/          # useNotes, useAlarm, useAlarmSettings, useTheme
 │  ├─ tokens/         # Kategori warna (single source)
 │  ├─ types/          # Definisi tipe Note
-│  ├─ utils/          # storage, alarmDb (IndexedDB), audioAlarm (Web Audio/MP3), dateUtils
+│  ├─ utils/          # storage, alarmDb (IndexedDB), audioAlarm (Web Audio/MP3), dateUtils, pushManager (push notifications)
 │  ├─ App.tsx
 │  ├─ main.tsx
 │  └─ index.css       # Tokens warna (light/dark), tipografi, scrollbar
@@ -76,6 +83,8 @@ catatku/
 
 > **PWA (offline-ready):** `vite-plugin-pwa` + Workbox otomatis meng-generate `sw.js`, `workbox-*.js`, dan `manifest.webmanifest` ke `dist/` saat `npm run build`. Aset yang di-pre-cache: semua bundle JS/CSS, HTML shell, ikon, dan logo. Service worker tidak ada di `public/` — seluruhnya di-generate otomatis dari konfigurasi di `vite.config.ts`.
 
+> **Push Notification:** Vercel serverless functions (`api/`) mengirim push notification ke lock screen HP saat deadline mendekati. Cron job berjalan setiap 5 menit via Vercel Cron. Butuh VAPID keys + Vercel KV database.
+
 ## Penyimpanan Data
 
 - **localStorage** — catatan, preferensi tema, dan pengaturan alarm.
@@ -86,6 +95,32 @@ catatku/
 
 Spesifikasi lengkap (warna, tipografi, spacing, logo, aksesibilitas) ada di
 [`design-system/catatku/MASTER.md`](design-system/catatku/MASTER.md).
+
+## Push Notification Setup
+
+Push notification membutuhkan konfigurasi backend Vercel:
+
+1. **Generate VAPID Keys:**
+   ```bash
+   npx web-push generate-vapid-keys
+   ```
+
+2. **Aktifkan Vercel KV:**
+   - Vercel Dashboard → Storage → Create Database → KV → Connect to project
+
+3. **Set Environment Variables di Vercel:**
+   - `VAPID_PUBLIC_KEY` = public key dari step 1
+   - `VAPID_PRIVATE_KEY` = private key dari step 1
+   - `CRON_SECRET` = string acak (untuk verifikasi cron request)
+
+4. **Deploy:**
+   ```bash
+   git push  # Vercel auto-deploy + cron job aktif
+   ```
+
+5. **Install PWA ke iPhone:**
+   - Buka Safari → buka app → Share → Add to Home Screen
+   - Buka PWA → klik 🔔 "Aktifkan Notifikasi"
 
 ## Lisensi
 

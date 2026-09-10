@@ -13,4 +13,9 @@ export interface Note {
   deadline?: string;       // ISO timestamp (khusus Tugas)
   isCompleted?: boolean;   // Status selesai tugas
   notified?: boolean;      // Alarm sudah berbunyi
+  notifyFlags?: {          // Status push notification per tahap
+    day?: boolean;         // Sudah kirim "1 hari lagi"
+    hour?: boolean;        // Sudah kirim "1 jam lagi"
+    thirtyMin?: boolean;   // Sudah kirim "30 menit lagi"
+  };
 }

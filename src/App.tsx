@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTheme } from './hooks/useTheme';
 import { useNotes } from './hooks/useNotes';
 import { useAlarm } from './hooks/useAlarm';
@@ -14,6 +14,12 @@ import { BackupModal } from './components/BackupModal';
 import { AlarmSettingsModal } from './components/AlarmSettingsModal';
 import { MobileFab } from './components/MobileFab';
 import { Note } from './types/note';
+import {
+  isPushSupported,
+  requestNotificationPermission,
+  getExistingSubscription,
+  subscribeToPush,
+} from './utils/pushManager';
 
 export const App: React.FC = () => {
   // Theme hook
@@ -36,6 +42,8 @@ export const App: React.FC = () => {
     toggleComplete,
     markNotesNotified,
     resetDefaults,
+    enableNoteNotifications,
+    disableNoteNotifications,
     setNotes,
   } = useNotes();
 
@@ -68,6 +76,32 @@ export const App: React.FC = () => {
   const [deletingNote, setDeletingNote] = useState<Note | null>(null);
   const [isBackupOpen, setIsBackupOpen] = useState(false);
   const [isAlarmSettingsOpen, setIsAlarmSettingsOpen] = useState(false);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+
+  // Check notification permission on mount
+  useEffect(() => {
+    if (!isPushSupported()) return;
+    if (Notification.permission === 'granted') {
+      getExistingSubscription().then((sub) => {
+        setNotificationsEnabled(Boolean(sub));
+      });
+    }
+  }, []);
+
+  const handleToggleNotifications = async () => {
+    if (!isPushSupported()) return;
+
+    if (notificationsEnabled) {
+      setNotificationsEnabled(false);
+      return;
+    }
+
+    const granted = await requestNotificationPermission();
+    if (!granted) return;
+
+    const sub = await subscribeToPush();
+    setNotificationsEnabled(Boolean(sub));
+  };
 
   const handleOpenCreate = () => {
     setEditingNote(null);
@@ -106,6 +140,8 @@ export const App: React.FC = () => {
         onTestSound={testSound}
         isTestingSound={isTestingSound}
         onOpenSettings={() => setIsAlarmSettingsOpen(true)}
+        notificationsEnabled={notificationsEnabled}
+        onToggleNotifications={handleToggleNotifications}
       />
 
       {/* Main Content */}
@@ -134,6 +170,8 @@ export const App: React.FC = () => {
           onToggleStar={toggleStar}
           onToggleComplete={toggleComplete}
           onOpenCreate={handleOpenCreate}
+          onNotifyEnabled={enableNoteNotifications}
+          onNotifyDisabled={disableNoteNotifications}
         />
       </main>
 

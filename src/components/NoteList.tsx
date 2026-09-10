@@ -12,6 +12,8 @@ interface NoteListProps {
   onToggleStar: (id: string) => void;
   onToggleComplete: (id: string) => void;
   onOpenCreate: () => void;
+  onNotifyEnabled?: (id: string) => void;
+  onNotifyDisabled?: (id: string) => void;
 }
 
 export const NoteList: React.FC<NoteListProps> = ({
@@ -23,6 +25,8 @@ export const NoteList: React.FC<NoteListProps> = ({
   onToggleStar,
   onToggleComplete,
   onOpenCreate,
+  onNotifyEnabled,
+  onNotifyDisabled,
 }) => {
   const hasAnyNotes = pinnedNotes.length > 0 || regularNotes.length > 0;
 
@@ -73,6 +77,8 @@ export const NoteList: React.FC<NoteListProps> = ({
                 onDelete={onDelete}
                 onToggleStar={onToggleStar}
                 onToggleComplete={onToggleComplete}
+                onNotifyEnabled={onNotifyEnabled}
+                onNotifyDisabled={onNotifyDisabled}
               />
             ))}
           </div>
@@ -97,6 +103,8 @@ export const NoteList: React.FC<NoteListProps> = ({
                 onDelete={onDelete}
                 onToggleStar={onToggleStar}
                 onToggleComplete={onToggleComplete}
+                onNotifyEnabled={onNotifyEnabled}
+                onNotifyDisabled={onNotifyDisabled}
               />
             ))}
           </div>

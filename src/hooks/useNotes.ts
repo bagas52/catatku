@@ -2,6 +2,7 @@ import { useState, useMemo, useCallback } from 'react';
 import { Note, FilterCategory } from '../types/note';
 import { getStoredNotes, saveStoredNotes, getSampleNotes } from '../utils/storage';
 import { playChimeSound } from '../utils/audioAlarm';
+import { syncSubscriptionToBackend, removeNoteFromBackend } from '../utils/pushManager';
 
 export function useNotes() {
   const [notes, setNotes] = useState<Note[]>(() => getStoredNotes());
@@ -26,31 +27,54 @@ export function useNotes() {
       deadline: data.deadline,
       isCompleted: false,
       notified: false,
+      notifyFlags: data.notifyFlags,
     };
     persistNotes([newNote, ...notes]);
     playChimeSound();
+
+    // Sync to backend if Tugas with deadline + notifications enabled
+    if (newNote.category === 'Tugas' && newNote.deadline && newNote.notifyFlags) {
+      syncSubscriptionToBackend(newNote.id, newNote.title, newNote.deadline).catch(() => {});
+    }
   }, [notes, persistNotes]);
 
   const updateNote = useCallback((id: string, data: Partial<Note>) => {
     const nowISO = new Date().toISOString();
+    const oldNote = notes.find((n) => n.id === id);
     const updated = notes.map((n) => {
       if (n.id === id) {
         return {
           ...n,
           ...data,
           updatedAt: nowISO,
-          // Reset notification if deadline has changed
           notified: data.deadline !== n.deadline ? false : n.notified,
         };
       }
       return n;
     });
     persistNotes(updated);
+
+    // Sync to backend if Tugas with deadline + notifications
+    const updatedNote = updated.find((n) => n.id === id);
+    if (updatedNote?.category === 'Tugas' && updatedNote.deadline) {
+      if (updatedNote.notifyFlags) {
+        syncSubscriptionToBackend(id, updatedNote.title, updatedNote.deadline).catch(() => {});
+      } else if (oldNote?.notifyFlags) {
+        // Notifications were disabled — remove from backend
+        removeNoteFromBackend(id).catch(() => {});
+      }
+    }
   }, [notes, persistNotes]);
 
   const deleteNote = useCallback((id: string) => {
     const updated = notes.filter((n) => n.id !== id);
     persistNotes(updated);
+
+    // Remove from backend if it had notifications
+    const deletedNote = notes.find((n) => n.id === id);
+    if (deletedNote?.notifyFlags) {
+      removeNoteFromBackend(id).catch(() => {});
+    }
   }, [notes, persistNotes]);
 
   const toggleStar = useCallback((id: string) => {
@@ -83,6 +107,21 @@ export function useNotes() {
     const initial = getSampleNotes();
     persistNotes(initial);
   }, [persistNotes]);
+
+  const enableNoteNotifications = useCallback((id: string) => {
+    const updated = notes.map((n) =>
+      n.id === id ? { ...n, notifyFlags: { day: false, hour: false, thirtyMin: false } } : n
+    );
+    persistNotes(updated);
+  }, [notes, persistNotes]);
+
+  const disableNoteNotifications = useCallback((id: string) => {
+    const updated = notes.map((n) =>
+      n.id === id ? { ...n, notifyFlags: undefined } : n
+    );
+    persistNotes(updated);
+    removeNoteFromBackend(id).catch(() => {});
+  }, [notes, persistNotes]);
 
   // Filter notes based on activeCategory and searchQuery
   const filteredNotes = useMemo(() => {
@@ -145,6 +184,8 @@ export function useNotes() {
     toggleComplete,
     markNotesNotified,
     resetDefaults,
+    enableNoteNotifications,
+    disableNoteNotifications,
     setNotes: persistNotes,
   };
 }

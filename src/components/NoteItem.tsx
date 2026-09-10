@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Star, MoreVertical, Edit3, Trash2, CheckCircle2, Circle } from 'lucide-react';
+import { Star, MoreVertical, Edit3, Trash2, CheckCircle2, Circle, Bell } from 'lucide-react';
 import { Note } from '../types/note';
 import { formatNoteDate, checkDeadlineStatus } from '../utils/dateUtils';
 import { CATEGORY_COLORS, DEFAULT_CATEGORY_COLOR } from '../tokens/categoryColors';
+import { NotificationToggle } from './NotificationToggle';
 
 interface NoteItemProps {
   note: Note;
@@ -10,6 +11,8 @@ interface NoteItemProps {
   onDelete: (note: Note) => void;
   onToggleStar: (id: string) => void;
   onToggleComplete?: (id: string) => void;
+  onNotifyEnabled?: (id: string) => void;
+  onNotifyDisabled?: (id: string) => void;
 }
 
 export const NoteItem: React.FC<NoteItemProps> = ({
@@ -18,6 +21,8 @@ export const NoteItem: React.FC<NoteItemProps> = ({
   onDelete,
   onToggleStar,
   onToggleComplete,
+  onNotifyEnabled,
+  onNotifyDisabled,
 }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -82,8 +87,17 @@ export const NoteItem: React.FC<NoteItemProps> = ({
           </h2>
         </div>
 
-        {/* Right: Star icon & options menu */}
+        {/* Right: Notification toggle, Star icon & options menu */}
         <div className="flex items-center gap-1 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
+          {/* Notification Toggle */}
+          {onNotifyEnabled && onNotifyDisabled && (
+            <NotificationToggle
+              note={note}
+              onNotifyEnabled={onNotifyEnabled}
+              onNotifyDisabled={onNotifyDisabled}
+            />
+          )}
+
           {/* Star Button */}
           <button
             type="button"
@@ -158,6 +172,11 @@ export const NoteItem: React.FC<NoteItemProps> = ({
           <span className="ml-auto px-2 py-0.5 rounded text-[11px] font-medium bg-warn text-white shadow-xs">
             {deadlineStatus.label}
           </span>
+        )}
+
+        {/* Notification icon for tasks with notifications enabled */}
+        {note.notifyFlags && (
+          <Bell className="w-3 h-3 text-accent fill-accent" />
         )}
 
         {note.isCompleted && (

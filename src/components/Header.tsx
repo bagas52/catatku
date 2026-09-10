@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sun, Moon, Plus, Download, BellRing, Settings } from 'lucide-react';
+import { Sun, Moon, Plus, Download, BellRing, Settings, Bell } from 'lucide-react';
 
 interface HeaderProps {
   isDark: boolean;
@@ -9,6 +9,8 @@ interface HeaderProps {
   onTestSound: () => void;
   isTestingSound: boolean;
   onOpenSettings: () => void;
+  notificationsEnabled: boolean;
+  onToggleNotifications: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -19,6 +21,8 @@ export const Header: React.FC<HeaderProps> = ({
   onTestSound,
   isTestingSound,
   onOpenSettings,
+  notificationsEnabled,
+  onToggleNotifications,
 }) => {
   return (
     <header className="sticky top-0 z-30 bg-surface/95 backdrop-blur-sm border-b border-muted/20">
@@ -76,6 +80,21 @@ export const Header: React.FC<HeaderProps> = ({
             aria-label="Pengaturan bunyi alarm"
           >
             <Settings className="w-4 h-4" />
+          </button>
+
+          {/* Notification Toggle */}
+          <button
+            type="button"
+            onClick={onToggleNotifications}
+            title={notificationsEnabled ? 'Notifikasi aktif (klik untuk matikan)' : 'Aktifkan notifikasi push'}
+            className={`p-2 rounded transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 ${
+              notificationsEnabled
+                ? 'text-accent hover:text-accent/70'
+                : 'text-muted hover:text-ink hover:bg-muted/10'
+            }`}
+            aria-label="Toggle notifikasi"
+          >
+            <Bell className={`w-4 h-4 ${notificationsEnabled ? 'fill-accent' : ''}`} />
           </button>
 
           {/* Dark Mode Toggle */}

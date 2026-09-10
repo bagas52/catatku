@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { X, Star, Calendar } from 'lucide-react';
+import { X, Star, Calendar, Bell } from 'lucide-react';
 import { Note, CategoryType } from '../types/note';
+import { isPushSupported } from '../utils/pushManager';
 
 interface NoteFormModalProps {
   isOpen: boolean;
@@ -21,6 +22,7 @@ export const NoteFormModal: React.FC<NoteFormModalProps> = ({
   const [isPinned, setIsPinned] = useState(false);
   const [deadline, setDeadline] = useState('');
   const [isCompleted, setIsCompleted] = useState(false);
+  const [enableNotifications, setEnableNotifications] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
@@ -39,6 +41,7 @@ export const NoteFormModal: React.FC<NoteFormModalProps> = ({
       } else {
         setDeadline('');
       }
+      setEnableNotifications(Boolean(editingNote.notifyFlags));
     } else {
       setTitle('');
       setContent('');
@@ -46,6 +49,7 @@ export const NoteFormModal: React.FC<NoteFormModalProps> = ({
       setIsPinned(false);
       setDeadline('');
       setIsCompleted(false);
+      setEnableNotifications(false);
     }
     setErrorMessage('');
   }, [editingNote, isOpen]);
@@ -66,6 +70,10 @@ export const NoteFormModal: React.FC<NoteFormModalProps> = ({
       isPinned,
       deadline: category === 'Tugas' && deadline ? new Date(deadline).toISOString() : undefined,
       isCompleted: category === 'Tugas' ? isCompleted : false,
+      notifyFlags:
+        category === 'Tugas' && deadline && enableNotifications
+          ? { day: false, hour: false, thirtyMin: false }
+          : undefined,
     };
 
     onSave(payload);
@@ -221,6 +229,29 @@ export const NoteFormModal: React.FC<NoteFormModalProps> = ({
                   </label>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* Notification toggle for Tugas with deadline */}
+          {category === 'Tugas' && deadline && isPushSupported() && (
+            <div className="flex items-center justify-between p-3 bg-bg/70 rounded border border-muted/20">
+              <div className="flex items-center gap-2">
+                <Bell className="w-3.5 h-3.5 text-accent" />
+                <span className="text-xs font-heading font-medium text-ink">Notifikasi push ke HP</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setEnableNotifications(!enableNotifications)}
+                className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 ${
+                  enableNotifications ? 'bg-accent' : 'bg-muted/30'
+                }`}
+              >
+                <span
+                  className={`inline-block h-3.5 w-3.5 rounded-full bg-white transition-transform ${
+                    enableNotifications ? 'translate-x-4.5' : 'translate-x-0.5'
+                  }`}
+                />
+              </button>
             </div>
           )}
 
