@@ -15,10 +15,11 @@
       "destination": "/backend/api/:path*"
     }
   ],
-  "crons": [
-    {
+  "schedules": {
+    "check-deadlines": {
+      "schedule": "*/15 * * * *",
       "path": "/api/cron/check-deadlines",
-      "schedule": "*/5 * * * *"
+      "requestMethod": "GET"
     }
-  ]
+  }
 }

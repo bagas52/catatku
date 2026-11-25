@@ -66,7 +66,7 @@ catatku/
 ├─ backend/           # Vercel serverless functions (push notification)
 │  ├─ api/
 │  │  ├─ _lib/        # webpush.ts (kirim push), kv.ts (Vercel KV client)
-│  │  ├─ cron/        # check-deadlines.ts (cron setiap 5 menit)
+│  │  ├─ cron/        # check-deadlines.ts (dijalankan tiap 15 menit)
 │  │  ├─ subscribe.ts
 │  │  └─ unsubscribe.ts
 │  ├─ package.json
@@ -74,7 +74,7 @@ catatku/
 ├─ design-system/     # Dokumentasi & aset identitas visual
 │  └─ catatku/MASTER.md
 ├─ package.json       # npm workspaces: frontend + backend
-├─ vercel.json        # Build frontend, functions backend, rewrite /api, cron
+├─ vercel.json        # Build frontend, functions backend, rewrite /api, schedule
 └─ .env.example       # Contoh env backend (lihat juga frontend/.env.example)
 ```
 
@@ -82,7 +82,7 @@ Frontend dan backend dipisah menjadi dua folder, tetapi tetap **satu project Ver
 
 > **PWA (offline-ready):** `vite-plugin-pwa` + Workbox otomatis meng-generate `sw.js`, `workbox-*.js`, dan `manifest.webmanifest` ke `frontend/dist/` saat `npm run build`. Aset yang di-pre-cache: semua bundle JS/CSS, HTML shell, ikon, dan logo. Service worker di-generate dari konfigurasi `frontend/vite.config.ts`, lalu meng-import `frontend/public/push-handler.js` untuk menampilkan notifikasi push.
 
-> **Push Notification:** Vercel serverless functions di `backend/api/` mengirim push notification ke lock screen HP saat deadline mendekati. Cron job berjalan setiap 5 menit via Vercel Cron. Pengingat dikirim sekali per jendela waktu: 1 hari (≤24 jam), 1 jam (≤60 menit), dan 30 menit (≤30 menit) sebelum tenggat. Butuh VAPID keys + Vercel KV database.
+> **Push Notification:** Vercel serverless functions di `backend/api/` mengirim push notification ke lock screen HP saat deadline mendekati. Penjadwal berjalan setiap 15 menit via Vercel Schedules (kompatibel dengan paket Hobby). Pengingat dikirim sekali per jendela waktu: 1 hari (≤24 jam), 1 jam (≤60 menit), dan 30 menit (≤30 menit) sebelum tenggat. Butuh VAPID keys + Vercel KV database.
 
 ## Penyimpanan Data
 
@@ -117,7 +117,7 @@ Push notification **hanya aktif setelah aplikasi di-deploy ke Vercel** (endpoint
 
 4. **Deploy:**
    ```bash
-   git push  # Vercel auto-deploy + cron job aktif
+   git push  # Vercel auto-deploy + schedule aktif
    ```
    Vercel menggunakan `vercel.json` di root: build frontend, daftarkan function dari `backend/api/**/*.ts`, dan rewrite `/api/*` ke function tersebut.
 
@@ -126,7 +126,7 @@ Push notification **hanya aktif setelah aplikasi di-deploy ke Vercel** (endpoint
    - iPhone: Safari → Share → **Add to Home Screen** → buka PWA → klik 🔔 → izinkan notifikasi (iOS 16.4+)
    - Centang 🔔 pada tugas yang ingin diingatkan, atau aktifkan di form saat membuat/edit tugas
 
-6. **Coba cepat:** buat tugas dengan tenggat ±32 menit lagi. Notifikasi "1 Jam Lagi" akan sampai dalam maksimal 5 menit, lalu "30 Menit Lagi" saat waktunya tiba.
+6. **Coba cepat:** buat tugas dengan tenggat ±45 menit lagi. Notifikasi "1 Jam Lagi" akan sampai dalam beberapa menit, lalu "30 Menit Lagi" saat waktunya tiba.
 
 > Matikan 🔔 di Header untuk berhenti mengirim notifikasi sekaligus menghapus data subscription di server. Menandai tugas selesai atau menghapus tugas juga menghentikan pengingatnya.
 
