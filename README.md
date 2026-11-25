@@ -38,53 +38,51 @@ npm install
 npm run dev
 ```
 
-Dev server berjalan di **http://localhost:3000** (port dikonfigurasi di `vite.config.ts`).
+Dev server berjalan di **http://localhost:3000** (port dikonfigurasi di `frontend/vite.config.ts`).
 
 ### Skrip lainnya
 
 | Skrip | Keterangan |
 |-------|-----------|
-| `npm run dev` | Jalankan dev server (hot-reload) |
-| `npm run build` | Build produksi ke folder `dist/` (tsc + vite) |
+| `npm run dev` | Jalankan dev server frontend (hot-reload) |
+| `npm run build` | Build produksi frontend ke `frontend/dist/` (tsc + vite) |
 | `npm run preview` | Pratinjau hasil build produksi |
+| `npm run typecheck` | Cek tipe TypeScript frontend |
+| `npm run typecheck -w backend` | Cek tipe TypeScript backend |
 
 ## Struktur Proyek
 
 ```
 catatku/
-├─ api/               # Vercel serverless functions (push notification backend)
-│  ├─ _lib/           # Shared: webpush.ts (kirim push), kv.ts (Vercel KV client)
-│  ├─ subscribe.ts    # Simpan push subscription + deadline
-│  ├─ unsubscribe.ts  # Hapus subscription/note
-│  └─ cron/           # Cron job (setiap 5 menit)
-│     └─ check-deadlines.ts  # Cek deadline → kirim push ke HP
-├─ public/            # Aset statis (ikon PWA, favicon, logo, handler push)
-│  ├─ favicon-180.png
-│  ├─ favicon-192.png
-│  ├─ favicon-512.png
-│  ├─ favicon.png
-│  ├─ logo.svg
-│  └─ push-handler.js # Event push/notificationclick untuk service worker
-├─ src/
-│  ├─ components/     # Komponen UI (Header, NoteList, NoteItem, SearchBar, modal, dll)
-│  ├─ context/        # NoteContext
-│  ├─ hooks/          # useNotes, useAlarm, useAlarmSettings, useTheme
-│  ├─ tokens/         # Kategori warna (single source)
-│  ├─ types/          # Definisi tipe Note
-│  ├─ utils/          # storage, alarmDb (IndexedDB), audioAlarm (Web Audio/MP3), dateUtils, pushManager (push notifications)
-│  ├─ App.tsx
-│  ├─ main.tsx
-│  └─ index.css       # Tokens warna (light/dark), tipografi, scrollbar
-├─ index.html
-├─ tailwind.config.js
-├─ vite.config.ts     # Konfigurasi Vite + vite-plugin-pwa (Workbox)
-└─ design-system/     # Dokumentasi & aset identitas visual
-   └─ catatku/MASTER.md
+├─ frontend/          # Aplikasi React (Vite + Tailwind + PWA)
+│  ├─ public/         # Ikon PWA, favicon, logo, push-handler.js
+│  ├─ src/            # Komponen, hooks, utils, tipe, styles
+│  ├─ index.html
+│  ├─ package.json
+│  ├─ vite.config.ts  # Vite + vite-plugin-pwa (Workbox)
+│  ├─ tailwind.config.js
+│  ├─ postcss.config.js
+│  └─ tsconfig*.json
+├─ backend/           # Vercel serverless functions (push notification)
+│  ├─ api/
+│  │  ├─ _lib/        # webpush.ts (kirim push), kv.ts (Vercel KV client)
+│  │  ├─ cron/        # check-deadlines.ts (cron setiap 5 menit)
+│  │  ├─ subscribe.ts
+│  │  └─ unsubscribe.ts
+│  ├─ package.json
+│  └─ tsconfig.json
+├─ design-system/     # Dokumentasi & aset identitas visual
+│  └─ catatku/MASTER.md
+├─ package.json       # npm workspaces: frontend + backend
+├─ vercel.json        # Build frontend, functions backend, rewrite /api, cron
+└─ .env.example       # Contoh env backend (lihat juga frontend/.env.example)
 ```
 
-> **PWA (offline-ready):** `vite-plugin-pwa` + Workbox otomatis meng-generate `sw.js`, `workbox-*.js`, dan `manifest.webmanifest` ke `dist/` saat `npm run build`. Aset yang di-pre-cache: semua bundle JS/CSS, HTML shell, ikon, dan logo. Service worker di-generate dari konfigurasi `vite.config.ts`, lalu meng-import `public/push-handler.js` untuk menampilkan notifikasi push.
+Frontend dan backend dipisah menjadi dua folder, tetapi tetap **satu project Vercel**: `vercel.json` di root meng-build `frontend/` dan meneruskan `/api/*` ke `backend/api/*`.
 
-> **Push Notification:** Vercel serverless functions (`api/`) mengirim push notification ke lock screen HP saat deadline mendekati. Cron job berjalan setiap 5 menit via Vercel Cron. Pengingat dikirim sekali per jendela waktu: 1 hari (≤24 jam), 1 jam (≤60 menit), dan 30 menit (≤30 menit) sebelum tenggat. Butuh VAPID keys + Vercel KV database.
+> **PWA (offline-ready):** `vite-plugin-pwa` + Workbox otomatis meng-generate `sw.js`, `workbox-*.js`, dan `manifest.webmanifest` ke `frontend/dist/` saat `npm run build`. Aset yang di-pre-cache: semua bundle JS/CSS, HTML shell, ikon, dan logo. Service worker di-generate dari konfigurasi `frontend/vite.config.ts`, lalu meng-import `frontend/public/push-handler.js` untuk menampilkan notifikasi push.
+
+> **Push Notification:** Vercel serverless functions di `backend/api/` mengirim push notification ke lock screen HP saat deadline mendekati. Cron job berjalan setiap 5 menit via Vercel Cron. Pengingat dikirim sekali per jendela waktu: 1 hari (≤24 jam), 1 jam (≤60 menit), dan 30 menit (≤30 menit) sebelum tenggat. Butuh VAPID keys + Vercel KV database.
 
 ## Penyimpanan Data
 
@@ -115,10 +113,13 @@ Push notification **hanya aktif setelah aplikasi di-deploy ke Vercel** (endpoint
    - `VAPID_PRIVATE_KEY` = private key — **jangan pernah commit**
    - `CRON_SECRET` = string acak (verifikasi request cron)
 
+   Untuk development lokal: taruh public key di `frontend/.env.local` (lihat `frontend/.env.example`) dan env backend di `.env.local` root. Keduanya sudah di-gitignore.
+
 4. **Deploy:**
    ```bash
    git push  # Vercel auto-deploy + cron job aktif
    ```
+   Vercel menggunakan `vercel.json` di root: build frontend, daftarkan function dari `backend/api/**/*.ts`, dan rewrite `/api/*` ke function tersebut.
 
 5. **Aktifkan di perangkat:**
    - Android/Chrome: buka aplikasi → klik 🔔 di Header → izinkan notifikasi

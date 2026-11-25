@@ -25,7 +25,7 @@
 
 ## 2. Color Tokens
 
-Semua warna semantik didefinisikan di `src/index.css` sebagai CSS variables.
+Semua warna semantik didefinisikan di `frontend/src/index.css` sebagai CSS variables.
 
 | Role | Light | Dark | Kontras teks |
 |------|-------|------|--------------|
@@ -37,7 +37,7 @@ Semua warna semantik didefinisikan di `src/index.css` sebagai CSS variables.
 | `--warn` (peringatan) | `#B85C38` | `#E08A5C` | 4.5:1 / 6.1:1 ✅ |
 
 ### Kategori warna (border kiri catatan)
-Single source: `src/tokens/categoryColors.ts` — tersinkron dengan `tailwind.config.js`.
+Single source: `frontend/src/tokens/categoryColors.ts` — tersinkron dengan `frontend/tailwind.config.js`.
 
 | Kategori | Hex | Kontras pada permukaan terang |
 |----------|-----|-------------------------------|
@@ -123,8 +123,8 @@ Marka logo CatatKu: **notebook terbuka + tanda centang** (unsur "mencatat" & "se
 |------|--------|-----------|
 | Logo mark (SVG) | `design-system/catatku/logos/catatku-logo-mark.svg` | Varian 1 (direkomendasikan) — notebook terbuka + centang |
 | Alternatif (SVG) | `design-system/catatku/logos/catatku-logo-check.svg` | Varian 2 — kertas + garis tulis + centang |
-| Dipakai app | `public/logo.svg` | Sumber favicon & header |
-| Favicon PNG | `public/favicon*.png`, `site.webmanifest` | 32/180/192/512 |
+| Dipakai app | `frontend/public/logo.svg` | Sumber favicon & header |
+| Favicon PNG | `frontend/public/favicon*.png`, `manifest.webmanifest` | 32/180/192/512 |
 | Preview galeri | `design-system/catatku/logos/preview.html` | Perbandingan varian ⟶ `logo-options.png` |
 
 **Palet marka** (ikuti token §2):
@@ -206,8 +206,8 @@ Semua elemen interaktif punya feedback hover halus (`transition-colors` / `trans
 - Konten tidak tersembunyi di balik header sticky / FAB (padding bawah main `pb-24 sm:pb-12`).
 - Touch target ≥ 44px di mobile untuk kontrol ikon kecil (beri padding tombol).
 - Screenshot verifikasi mobile tersimpan di `design-system/catatku/mobile-check/` (iPhone 12/SE, Pixel 5, 320px, iPad).
-- **PWA offline-ready**: `vite-plugin-pwa` (Workbox) auto-generate `sw.js` + `manifest.webmanifest` saat `npm run build`. Pre-cache mencakup semua bundle JS/CSS, HTML shell, ikon, dan logo. Konfigurasi di `vite.config.ts` (section `VitePWA`).
-- **Push Notification**: Backend Vercel serverless (`api/`) + Vercel KV. Cron job setiap 5 menit via Vercel Cron. Kirim push ke lock screen HP: 1 hari / 1 jam / 30 menit sebelum deadline (jendela waktu terpisah agar tidak double-notify). Service worker hasil Workbox meng-import `public/push-handler.js` untuk event `push` dan `notificationclick`. Toggle per-catatan (ikon 🔔/🔕 di NoteItem, toggle di NoteFormModal). Tombol 🔔 di Header untuk global enable/disable (disable juga uninstall subscription & menghapus data KV). Syarat: PWA ter-install ke Home Screen + izin notifikasi + iOS 16.4+.
+- **PWA offline-ready**: `vite-plugin-pwa` (Workbox) auto-generate `sw.js` + `manifest.webmanifest` saat `npm run build`. Pre-cache mencakup semua bundle JS/CSS, HTML shell, ikon, dan logo. Konfigurasi di `frontend/vite.config.ts` (section `VitePWA`).
+- **Push Notification**: Backend Vercel serverless (`backend/api/`) + Vercel KV. Cron job setiap 5 menit via Vercel Cron. Kirim push ke lock screen HP: 1 hari / 1 jam / 30 menit sebelum deadline (jendela waktu terpisah agar tidak double-notify). Service worker hasil Workbox meng-import `frontend/public/push-handler.js` untuk event `push` dan `notificationclick`. Toggle per-catatan (ikon 🔔/🔕 di NoteItem, toggle di NoteFormModal). Tombol 🔔 di Header untuk global enable/disable (disable juga uninstall subscription & menghapus data KV). Syarat: PWA ter-install ke Home Screen + izin notifikasi + iOS 16.4+.
 - Pengguna dapat menginstall ke Home Screen iPhone/Android: buka di browser → Share/Menu → "Add to Home Screen". PWA terbuka fullscreen seperti native app.
 
 ---

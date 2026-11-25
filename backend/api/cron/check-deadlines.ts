@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { getSubscription, getNotes, setNotes, clearAll } from './_lib/kv.js';
-import { sendPush } from './_lib/webpush.js';
+import { getSubscription, getNotes, setNotes, clearAll } from '../_lib/kv.js';
+import { sendPush } from '../_lib/webpush.js';
 
 export const config = {
   maxDuration: 30,

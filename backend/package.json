@@ -1,0 +1,19 @@
+{
+  "name": "@catatku/backend",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@vercel/kv": "^3.0.0",
+    "web-push": "^3.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22.5.4",
+    "@types/web-push": "^3.6.4",
+    "@vercel/node": "^32.0.0",
+    "typescript": "^5.5.4"
+  }
+}
