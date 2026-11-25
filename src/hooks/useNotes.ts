@@ -2,7 +2,12 @@ import { useState, useMemo, useCallback } from 'react';
 import { Note, FilterCategory } from '../types/note';
 import { getStoredNotes, saveStoredNotes, getSampleNotes } from '../utils/storage';
 import { playChimeSound } from '../utils/audioAlarm';
-import { syncSubscriptionToBackend, removeNoteFromBackend } from '../utils/pushManager';
+import {
+  syncSubscriptionToBackend,
+  syncNotesToBackend,
+  removeNoteFromBackend,
+  clearBackendNotes,
+} from '../utils/pushManager';
 
 export function useNotes() {
   const [notes, setNotes] = useState<Note[]>(() => getStoredNotes());
@@ -93,6 +98,11 @@ export function useNotes() {
     persistNotes(updated);
     if (nextState) {
       playChimeSound();
+      if (target?.notifyFlags) {
+        removeNoteFromBackend(id).catch(() => {});
+      }
+    } else if (target?.notifyFlags && target.deadline) {
+      syncSubscriptionToBackend(id, target.title, target.deadline).catch(() => {});
     }
   }, [notes, persistNotes]);
 
@@ -103,25 +113,57 @@ export function useNotes() {
     persistNotes(updated);
   }, [notes, persistNotes]);
 
+  const replaceNotes = useCallback(
+    async (newNotes: Note[]) => {
+      persistNotes(newNotes);
+
+      // Import/reset mengganti seluruh data: sinkronkan juga daftar di backend
+      // supaya tugas lama tidak terus mengirim pengingat.
+      const cleared = await clearBackendNotes();
+      if (!cleared) return;
+
+      const pushNotes = newNotes
+        .filter((n) => n.category === 'Tugas' && n.deadline && !n.isCompleted && n.notifyFlags)
+        .map((n) => ({ noteId: n.id, title: n.title, deadline: n.deadline as string }));
+      if (pushNotes.length) {
+        await syncNotesToBackend(pushNotes);
+      }
+    },
+    [persistNotes]
+  );
+
   const resetDefaults = useCallback(() => {
-    const initial = getSampleNotes();
-    persistNotes(initial);
-  }, [persistNotes]);
+    void replaceNotes(getSampleNotes());
+  }, [replaceNotes]);
 
-  const enableNoteNotifications = useCallback((id: string) => {
-    const updated = notes.map((n) =>
-      n.id === id ? { ...n, notifyFlags: { day: false, hour: false, thirtyMin: false } } : n
-    );
-    persistNotes(updated);
-  }, [notes, persistNotes]);
+  const enableNoteNotifications = useCallback(
+    async (id: string): Promise<boolean> => {
+      const note = notes.find((n) => n.id === id);
+      if (!note?.deadline) return false;
 
-  const disableNoteNotifications = useCallback((id: string) => {
-    const updated = notes.map((n) =>
-      n.id === id ? { ...n, notifyFlags: undefined } : n
-    );
-    persistNotes(updated);
-    removeNoteFromBackend(id).catch(() => {});
-  }, [notes, persistNotes]);
+      const synced = await syncSubscriptionToBackend(id, note.title, note.deadline);
+      if (!synced) return false;
+
+      const updated = notes.map((n) =>
+        n.id === id ? { ...n, notifyFlags: { day: false, hour: false, thirtyMin: false } } : n
+      );
+      persistNotes(updated);
+      return true;
+    },
+    [notes, persistNotes]
+  );
+
+  const disableNoteNotifications = useCallback(
+    async (id: string): Promise<boolean> => {
+      const removed = await removeNoteFromBackend(id);
+      const updated = notes.map((n) =>
+        n.id === id ? { ...n, notifyFlags: undefined } : n
+      );
+      persistNotes(updated);
+      return removed;
+    },
+    [notes, persistNotes]
+  );
 
   // Filter notes based on activeCategory and searchQuery
   const filteredNotes = useMemo(() => {
@@ -184,6 +226,7 @@ export function useNotes() {
     toggleComplete,
     markNotesNotified,
     resetDefaults,
+    replaceNotes,
     enableNoteNotifications,
     disableNoteNotifications,
     setNotes: persistNotes,

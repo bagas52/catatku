@@ -9,6 +9,10 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['logo.svg', 'favicon.png', 'favicon-180.png'],
+      devOptions: {
+        enabled: true,
+        type: 'module',
+      },
       manifest: {
         id: '/',
         name: 'CatatKu — Notebook Kuliah Mahasiswa',
@@ -29,7 +33,9 @@ export default defineConfig({
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
         navigateFallback: '/index.html',
-        cleanupOutdatedCaches: true
+        cleanupOutdatedCaches: true,
+        // Tambahkan handler push/notificationclick ke service worker hasil generate Workbox.
+        importScripts: ['/push-handler.js']
       }
     })
   ],

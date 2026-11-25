@@ -28,15 +28,36 @@ export async function setNotes(notes: PushNote[]) {
 }
 
 export async function addNote(note: PushNote) {
+  await upsertNotes([note]);
+}
+
+export async function upsertNotes(incoming: PushNote[]) {
+  if (!incoming.length) return;
+
   const existing = await getNotes();
-  const updated = existing.filter((n) => n.noteId !== note.noteId);
-  updated.push(note);
-  await setNotes(updated);
+  const byId = new Map(existing.map((n) => [n.noteId, n]));
+
+  for (const note of incoming) {
+    const previous = byId.get(note.noteId);
+    // Edit judul/catatan tidak boleh mengirim ulang pengingat yang sudah terkirim.
+    // Flag hanya di-reset ketika tenggatnya berubah.
+    const notifyFlags =
+      previous && previous.deadline === note.deadline
+        ? previous.notifyFlags
+        : note.notifyFlags;
+    byId.set(note.noteId, { ...note, notifyFlags });
+  }
+
+  await setNotes(Array.from(byId.values()));
 }
 
 export async function removeNote(noteId: string) {
   const existing = await getNotes();
   await setNotes(existing.filter((n) => n.noteId !== noteId));
+}
+
+export async function clearNotes() {
+  await kv.del(NOTES_KEY);
 }
 
 export async function clearAll() {

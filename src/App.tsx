@@ -16,9 +16,10 @@ import { MobileFab } from './components/MobileFab';
 import { Note } from './types/note';
 import {
   isPushSupported,
-  requestNotificationPermission,
   getExistingSubscription,
-  subscribeToPush,
+  syncNotesToBackend,
+  disablePushNotifications,
+  PUSH_STATE_EVENT,
 } from './utils/pushManager';
 
 export const App: React.FC = () => {
@@ -44,7 +45,7 @@ export const App: React.FC = () => {
     resetDefaults,
     enableNoteNotifications,
     disableNoteNotifications,
-    setNotes,
+    replaceNotes,
   } = useNotes();
 
   // Alarm settings state (customizable alarm sound)
@@ -77,6 +78,7 @@ export const App: React.FC = () => {
   const [isBackupOpen, setIsBackupOpen] = useState(false);
   const [isAlarmSettingsOpen, setIsAlarmSettingsOpen] = useState(false);
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [isTogglingNotifications, setIsTogglingNotifications] = useState(false);
 
   // Check notification permission on mount
   useEffect(() => {
@@ -86,21 +88,42 @@ export const App: React.FC = () => {
         setNotificationsEnabled(Boolean(sub));
       });
     }
+
+    // Status juga bisa berubah dari toggle 🔔 di daftar catatan.
+    const onPushStateChange = (event: Event) => {
+      const detail = (event as CustomEvent<{ enabled: boolean }>).detail;
+      if (typeof detail?.enabled === 'boolean') {
+        setNotificationsEnabled(detail.enabled);
+      }
+    };
+    window.addEventListener(PUSH_STATE_EVENT, onPushStateChange);
+    return () => window.removeEventListener(PUSH_STATE_EVENT, onPushStateChange);
   }, []);
 
   const handleToggleNotifications = async () => {
-    if (!isPushSupported()) return;
+    if (!isPushSupported() || isTogglingNotifications) return;
+    setIsTogglingNotifications(true);
 
-    if (notificationsEnabled) {
-      setNotificationsEnabled(false);
-      return;
+    try {
+      if (notificationsEnabled) {
+        await disablePushNotifications();
+        setNotificationsEnabled(false);
+        return;
+      }
+
+      const pushNotes = notes
+        .filter((note) => note.category === 'Tugas' && note.deadline && !note.isCompleted && note.notifyFlags)
+        .map((note) => ({
+          noteId: note.id,
+          title: note.title,
+          deadline: note.deadline as string,
+        }));
+
+      const ok = await syncNotesToBackend(pushNotes);
+      setNotificationsEnabled(ok);
+    } finally {
+      setIsTogglingNotifications(false);
     }
-
-    const granted = await requestNotificationPermission();
-    if (!granted) return;
-
-    const sub = await subscribeToPush();
-    setNotificationsEnabled(Boolean(sub));
   };
 
   const handleOpenCreate = () => {
@@ -141,6 +164,7 @@ export const App: React.FC = () => {
         isTestingSound={isTestingSound}
         onOpenSettings={() => setIsAlarmSettingsOpen(true)}
         notificationsEnabled={notificationsEnabled}
+        notificationsLoading={isTogglingNotifications}
         onToggleNotifications={handleToggleNotifications}
       />
 
@@ -214,7 +238,7 @@ export const App: React.FC = () => {
         onClose={() => setIsBackupOpen(false)}
         notes={notes}
         onImport={(imported) => {
-          setNotes(imported);
+          void replaceNotes(imported);
         }}
         onReset={resetDefaults}
       />

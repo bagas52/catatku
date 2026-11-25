@@ -10,6 +10,7 @@ interface HeaderProps {
   isTestingSound: boolean;
   onOpenSettings: () => void;
   notificationsEnabled: boolean;
+  notificationsLoading?: boolean;
   onToggleNotifications: () => void;
 }
 
@@ -22,6 +23,7 @@ export const Header: React.FC<HeaderProps> = ({
   isTestingSound,
   onOpenSettings,
   notificationsEnabled,
+  notificationsLoading = false,
   onToggleNotifications,
 }) => {
   return (
@@ -86,8 +88,15 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             type="button"
             onClick={onToggleNotifications}
-            title={notificationsEnabled ? 'Notifikasi aktif (klik untuk matikan)' : 'Aktifkan notifikasi push'}
-            className={`p-2 rounded transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 ${
+            disabled={notificationsLoading}
+            title={
+              notificationsLoading
+                ? 'Menghubungkan notifikasi…'
+                : notificationsEnabled
+                  ? 'Notifikasi aktif (klik untuk matikan)'
+                  : 'Aktifkan notifikasi push'
+            }
+            className={`p-2 rounded transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 disabled:opacity-50 ${
               notificationsEnabled
                 ? 'text-accent hover:text-accent/70'
                 : 'text-muted hover:text-ink hover:bg-muted/10'

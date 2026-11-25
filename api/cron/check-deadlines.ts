@@ -25,18 +25,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     let updated = false;
 
     for (const note of notes) {
+      note.notifyFlags = note.notifyFlags || { day: false, hour: false, thirtyMin: false };
       const deadlineMs = new Date(note.deadline).getTime();
       const diffMs = deadlineMs - now;
       const diffMin = diffMs / (1000 * 60);
 
+      // Tiap pengingat hanya aktif di jendela waktu sendiri agar tidak terkirim
+      // bertumpukan (misal tugas dibuat 10 menit sebelum tenggat).
       const checks = [
-        { key: 'day' as const, threshold: 1440, label: 'Besok', emoji: '📅' },
-        { key: 'hour' as const, threshold: 60, label: '1 Jam Lagi', emoji: '⏰' },
-        { key: 'thirtyMin' as const, threshold: 30, label: '30 Menit Lagi', emoji: '🔔' },
+        { key: 'day' as const, min: 60, max: 1440, label: 'Besok', emoji: '📅' },
+        { key: 'hour' as const, min: 30, max: 60, label: '1 Jam Lagi', emoji: '⏰' },
+        { key: 'thirtyMin' as const, min: 0, max: 30, label: '30 Menit Lagi', emoji: '🔔' },
       ];
 
       for (const check of checks) {
-        if (!note.notifyFlags[check.key] && diffMin > 0 && diffMin <= check.threshold) {
+        if (
+          !note.notifyFlags?.[check.key] &&
+          diffMin > check.min &&
+          diffMin <= check.max
+        ) {
           const result = await sendPush(subscription as never, {
             title: `${check.emoji} CatatKu — ${check.label}`,
             body: `Tugas: ${note.title}`,

@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { removeNote, clearAll } from './_lib/kv.js';
+import { removeNote, clearAll, clearNotes } from './_lib/kv.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
@@ -7,11 +7,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const { noteId, clearAll: clear } = req.body;
+    const { noteId, clearAll: clear, clearNotes: clearNotesOnly } = req.body;
 
     if (clear) {
       await clearAll();
       return res.status(200).json({ ok: true, cleared: true });
+    }
+
+    if (clearNotesOnly) {
+      await clearNotes();
+      return res.status(200).json({ ok: true, notesCleared: true });
     }
 
     if (!noteId) {
